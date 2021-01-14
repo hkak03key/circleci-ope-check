@@ -1,0 +1,86 @@
+version: 2.1
+executors:
+  alpine:
+    docker:
+      - image: alpine
+
+#----------------------------------------
+# Commands
+#----------------------------------------
+commands:
+  create_text:
+    parameters:
+      subject:
+        type: string
+      content:
+        type: string
+    steps:
+      - run:
+          name: create text << parameters.subject >>
+          command: |
+            mkdir ~/.aws
+            echo -e "[<< parameters.subject >>]\n<< parameters.content >>\n" >> ~/test.txt
+  print_text:
+    steps:
+      - run:
+          name: print text
+          command: |
+            cat ~/test.txt
+  
+
+#----------------------------------------
+# Jobs
+#----------------------------------------
+jobs:
+  create_text:
+    executor: alpine
+    parameters:
+      subject:
+        type: string
+      content:
+        type: string
+
+    steps:
+      - create_text:
+          subject: << parameters.subject >>
+          content: << parameters.content >>
+
+      - print_text
+
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - test.txt
+
+  print_text:
+    executor: alpine
+    steps:
+      - attach_workspace:
+          at: ~/
+
+      - print_text
+            
+
+#----------------------------------------
+# Workflows
+#----------------------------------------
+workflows:
+
+  workflow_1:
+    jobs:
+      - create_text:
+          name: create_text_1
+          subject: "1_1"
+          content: "1_1"
+      - create_text:
+          name: create_text_2_1
+          subject: "2_1"
+          content: "2_1"
+          requires:
+            - create_text_1
+      - print_text:
+          name: print_text
+          requires:
+            - create_text_2_1
+
+
