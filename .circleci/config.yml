@@ -51,7 +51,7 @@ workflows:
 
   workflow_1:
     jobs:
-      - persist:
+      - persist
       - attach:
           requires:
             - persist
