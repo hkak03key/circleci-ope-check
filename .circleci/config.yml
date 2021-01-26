@@ -20,9 +20,9 @@ jobs:
           command: |
             echo -e "this is test.\n" >> test.txt
       - persist_to_workspace:
-          root: .
+          root: ~/
           paths:
-            - test.txt
+            - project/test.txt
 
   attach:
     executor: alpine
