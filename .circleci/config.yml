@@ -5,45 +5,26 @@ executors:
       - image: alpine
 
 #----------------------------------------
-# Commands
-#----------------------------------------
-commands:
-  create_text:
-    parameters:
-      subject:
-        type: string
-      content:
-        type: string
-    steps:
-      - run:
-          name: create text << parameters.subject >>
-          command: |
-            echo -e "[<< parameters.subject >>]\n<< parameters.content >>\n" >> test.txt
-  
-
-#----------------------------------------
 # Jobs
 #----------------------------------------
 jobs:
-  create_text:
+  persist:
     executor: alpine
-    parameters:
-      subject:
-        type: string
-      content:
-        type: string
-
     steps:
-      - create_text:
-          subject: << parameters.subject >>
-          content: << parameters.content >>
-
+      - run:
+          name: pwd
+          command: |
+            pwd
+      - run:
+          name: create text
+          command: |
+            echo -e "this is test.\n" >> test.txt
       - persist_to_workspace:
           root: .
           paths:
             - test.txt
 
-  print_text:
+  attach:
     executor: alpine
     steps:
       - attach_workspace:
@@ -70,19 +51,9 @@ workflows:
 
   workflow_1:
     jobs:
-      - create_text:
-          name: create_text_1
-          subject: "1_1"
-          content: "1_1"
-      - create_text:
-          name: create_text_2_1
-          subject: "2_1"
-          content: "2_1"
+      - persist:
+      - attach:
           requires:
-            - create_text_1
-      - print_text:
-          name: print_text
-          requires:
-            - create_text_2_1
+            - persist
 
 
