@@ -18,14 +18,7 @@ commands:
       - run:
           name: create text << parameters.subject >>
           command: |
-            mkdir ~/.aws
-            echo -e "[<< parameters.subject >>]\n<< parameters.content >>\n" >> ~/test.txt
-  print_text:
-    steps:
-      - run:
-          name: print text
-          command: |
-            cat ~/test.txt
+            echo -e "[<< parameters.subject >>]\n<< parameters.content >>\n" >> test.txt
   
 
 #----------------------------------------
@@ -45,10 +38,8 @@ jobs:
           subject: << parameters.subject >>
           content: << parameters.content >>
 
-      - print_text
-
       - persist_to_workspace:
-          root: ~/
+          root: .
           paths:
             - test.txt
 
@@ -57,8 +48,19 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-
-      - print_text
+      - run:
+          name: pwd
+          command: |
+            pwd
+      - run:
+          name: ls -al .
+          command: |
+            ls -al .
+      - run:
+          name: ls -al ~/
+          command: |
+            ls -al ~/
+      
             
 
 #----------------------------------------
